@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS tenant (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    logo VARCHAR(255),
+    banner VARCHAR(255)
+);

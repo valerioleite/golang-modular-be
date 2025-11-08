@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: tenant-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tenant-database
+    ports:
+      - "5432:5432"
+    volumes:
+      - tenant-postgres-data:/var/lib/postgresql/data
+volumes:
+  tenant-postgres-data:
+
