@@ -1,7 +1,7 @@
 go 1.24.3
 
 use (
-	./services/tenant
 	./libraries/db
+	./services/storage
+	./services/tenant
 )
-
