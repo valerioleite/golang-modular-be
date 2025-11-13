@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"io"
+	"mime/multipart"
 	"services/storage/internal/storage/domain"
 	"services/storage/internal/storage/repository"
 )
@@ -19,8 +19,8 @@ func (s *StorageService) Init() error {
 	return s.repo.Init()
 }
 
-func (s *StorageService) Upload(ctx context.Context, bucket, filename string, file io.Reader) (*domain.Storage, error) {
-	storage, err := domain.NewStorage(bucket, filename)
+func (s *StorageService) Upload(ctx context.Context, bucket, filename string, file multipart.File, header *multipart.FileHeader) (*domain.Storage, error) {
+	storage, err := domain.NewStorage(bucket, filename, file, header)
 	if err != nil {
 		return nil, err
 	}

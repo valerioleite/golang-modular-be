@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"services/tenant/internal/tenant/domain"
 	"services/tenant/internal/tenant/repository"
-	"strings"
 )
 
 type TenantService struct {
@@ -17,10 +16,6 @@ func NewTenantService(repo repository.TenantRepository) *TenantService {
 }
 
 func (s *TenantService) Create(ctx context.Context, name string, logo, banner *string) (*domain.Tenant, error) {
-	if strings.TrimSpace(name) == "" {
-		return nil, domain.ErrNameRequired
-	}
-
 	tenant, err := domain.NewTenant(name, logo, banner)
 	if err != nil {
 		return nil, err

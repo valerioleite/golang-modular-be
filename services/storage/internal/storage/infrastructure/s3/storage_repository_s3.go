@@ -3,6 +3,7 @@ package s3
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"io"
 	"log/slog"
 	"os"
@@ -50,8 +51,10 @@ func (r *StorageRepositoryS3) setupS3Client() (*awsS3.Client, error) {
 	region := os.Getenv("AWS_REGION")
 	endpoint := os.Getenv("AWS_ENDPOINT")
 
-	cfg, err := config.LoadDefaultConfig(context.Background(),
+	cfg, err := config.LoadDefaultConfig(
+		context.Background(),
 		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
 		//config.WithClientLogMode(aws.LogRetries|aws.LogRequest),
 	)
 

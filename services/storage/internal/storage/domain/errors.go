@@ -46,5 +46,5 @@ func NewInvalidFieldsError(message string) *DomainError {
 var (
 	ErrBucketRequired   = NewInvalidFieldsError("bucket is required")
 	ErrFilenameRequired = NewInvalidFieldsError("filename is required")
+	ErrInvalidFile      = NewInvalidFieldsError("invalid file")
 )
-
