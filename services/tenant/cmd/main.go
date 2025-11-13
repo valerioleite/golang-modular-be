@@ -10,14 +10,38 @@ import (
 	"services/tenant/internal/tenant/service"
 
 	dbLib "libraries/db"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	setupLogger()
+	setupEnvFile()
+
+	database := setupDatabase()
+	defer closeDatabaseConnection(database)
+
+	runMigrations(database)
+	injectDependencies(database)
+}
+
+func setupEnvFile() {
+	err := godotenv.Load()
+	if err != nil {
+		slog.Error(".env file not found")
+		os.Exit(1)
+	}
+}
+
+func setupLogger() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
-	slog.SetDefault(logger)
 
+	slog.SetDefault(logger)
+}
+
+func setupDatabase() *dbLib.DB {
 	config := dbLib.NewConfigFromEnvironment()
 	database, err := config.Connect()
 	if err != nil {
@@ -25,11 +49,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer closeDatabaseConnection(database)
 	slog.Info("Database connection established successfully.")
-
-	runMigrations(database)
-	injectDependencies(database)
+	return database
 }
 
 func closeDatabaseConnection(database *dbLib.DB) {
