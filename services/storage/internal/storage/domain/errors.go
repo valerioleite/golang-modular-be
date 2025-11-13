@@ -1,6 +1,8 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrNotFound      = errors.New("not found")
@@ -20,10 +22,10 @@ func (e *DomainError) Error() string {
 }
 
 func (e *DomainError) HTTPStatus() int {
-	if e.BaseError == ErrNotFound {
+	if errors.Is(e.BaseError, ErrNotFound) {
 		return 404
 	}
-	if e.BaseError == ErrInvalidFields {
+	if errors.Is(e.BaseError, ErrInvalidFields) {
 		return 400
 	}
 	return 500
