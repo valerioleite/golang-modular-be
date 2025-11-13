@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
+	dbLib "libraries/db"
 	"log/slog"
 	"os"
 	serverHttp "services/tenant/internal/server"
 	tenantHttp "services/tenant/internal/tenant/delivery/http"
 	"services/tenant/internal/tenant/infrastructure/db"
 	"services/tenant/internal/tenant/service"
-
-	dbLib "libraries/db"
 
 	"github.com/joho/godotenv"
 )
