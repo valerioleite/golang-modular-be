@@ -40,9 +40,9 @@ func (h *UploadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := dto.StorageResponse{
-		ID:       storage.ID.String(),
 		Bucket:   storage.Bucket,
 		Filename: storage.Filename,
+		Path:     storage.Path,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

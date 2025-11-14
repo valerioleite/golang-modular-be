@@ -6,10 +6,7 @@ type UploadStorageRequest struct {
 }
 
 type StorageResponse struct {
-	ID       string `json:"id"`
 	Bucket   string `json:"bucket"`
 	Filename string `json:"filename"`
-	Key      string `json:"key"`
-	URL      string `json:"url,omitempty"`
+	Path     string `json:"path"`
 }
-

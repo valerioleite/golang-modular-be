@@ -66,6 +66,19 @@ func (r *StorageRepositoryS3) Upload(ctx context.Context, storage *domain.Storag
 	return nil
 }
 
+func (r *StorageRepositoryS3) Download(ctx context.Context, storage *domain.Storage) (io.ReadCloser, error) {
+	obj, err := r.client.GetObject(ctx, &awsS3.GetObjectInput{
+		Bucket: aws.String(storage.Bucket),
+		Key:    aws.String(storage.Filename),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return obj.Body, nil
+}
+
 func (r *StorageRepositoryS3) setupS3Client() (*awsS3.Client, error) {
 	region := os.Getenv("AWS_REGION")
 	endpoint := os.Getenv("AWS_ENDPOINT")

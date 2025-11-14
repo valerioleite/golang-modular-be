@@ -3,15 +3,13 @@ package domain
 import (
 	"mime/multipart"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 type Storage struct {
-	ID       uuid.UUID
 	Bucket   string
 	Filename string
 	File     multipart.File
+	Path     string
 }
 
 func NewStorage(bucket, filename string, file multipart.File, header *multipart.FileHeader) (*Storage, error) {
@@ -30,10 +28,25 @@ func NewStorage(bucket, filename string, file multipart.File, header *multipart.
 	}
 
 	return &Storage{
-		ID:       uuid.New(),
 		Bucket:   bucket,
 		Filename: filename,
 		File:     file,
+		Path:     bucket + "/" + filename,
+	}, nil
+}
+
+func DownloadStorage(bucket, filename string) (*Storage, error) {
+	if strings.TrimSpace(bucket) == "" {
+		return nil, ErrBucketRequired
+	}
+
+	if strings.TrimSpace(filename) == "" {
+		return nil, ErrFilenameRequired
+	}
+
+	return &Storage{
+		Bucket:   bucket,
+		Filename: filename,
 	}, nil
 }
 

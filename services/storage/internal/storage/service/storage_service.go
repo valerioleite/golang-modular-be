@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 	"mime/multipart"
 	"services/storage/internal/storage/domain"
 	"services/storage/internal/storage/repository"
@@ -21,10 +22,10 @@ func (s *StorageService) Init() error {
 
 func (s *StorageService) Upload(ctx context.Context, bucket, filename string, file multipart.File, header *multipart.FileHeader) (*domain.Storage, error) {
 	//TODO Need do it:
-	// - Download file
 	// - Integrate with tenant service
 	// - Create common library
 	// - Create http library
+	// - Add settings to aws credentials
 
 	storage, err := domain.NewStorage(bucket, filename, file, header)
 	if err != nil {
@@ -42,4 +43,13 @@ func (s *StorageService) Upload(ctx context.Context, bucket, filename string, fi
 	}
 
 	return storage, nil
+}
+
+func (s *StorageService) Download(ctx context.Context, bucket, filename string) (io.ReadCloser, error) {
+	storage, err := domain.DownloadStorage(bucket, filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.repo.Download(ctx, storage)
 }
