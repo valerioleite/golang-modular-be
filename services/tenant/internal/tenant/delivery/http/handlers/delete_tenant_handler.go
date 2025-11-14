@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	serverHttp "services/tenant/internal/server/http"
+	httpLib "libraries/http"
 	"services/tenant/internal/tenant/service"
 )
 
@@ -17,12 +17,12 @@ func NewDeleteTenantHandler(service *service.TenantService) *DeleteTenantHandler
 func (h *DeleteTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
-		serverHttp.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"id is required"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"id is required"})
 		return
 	}
 
 	if err := h.service.Delete(r.Context(), id); err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 

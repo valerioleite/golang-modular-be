@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"io"
+	httpLib "libraries/http"
 	"net/http"
-	serverHttp "services/storage/internal/server/http"
 	"services/storage/internal/storage/service"
 )
 
@@ -20,18 +20,18 @@ func (h *DownloadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) 
 	filename := r.PathValue("filename")
 
 	if bucket == "" {
-		serverHttp.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"bucket is required"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"bucket is required"})
 		return
 	}
 
 	if filename == "" {
-		serverHttp.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"filename is required"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"filename is required"})
 		return
 	}
 
 	reader, err := h.service.Download(r.Context(), bucket, filename)
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 	defer reader.Close()
@@ -42,7 +42,7 @@ func (h *DownloadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) 
 
 	_, err = io.Copy(w, reader)
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 }

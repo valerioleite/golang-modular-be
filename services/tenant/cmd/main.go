@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	dbLib "libraries/db"
+	httpLib "libraries/http"
 	"log/slog"
 	"os"
-	serverHttp "services/tenant/internal/server"
 	tenantHttp "services/tenant/internal/tenant/delivery/http"
 	"services/tenant/internal/tenant/infrastructure/db"
 	"services/tenant/internal/tenant/service"
@@ -75,12 +75,12 @@ func injectDependencies(database *dbLib.DB) {
 	tenantRepo := db.NewTenantRepositorySQL(database.DB)
 	tenantService := service.NewTenantService(tenantRepo)
 	router := tenantHttp.NewRouter(tenantService)
-	httpServer := serverHttp.NewServer(router)
+	httpServer := httpLib.NewServer(router)
 
 	startHttpServer(httpServer)
 }
 
-func startHttpServer(httpServer *serverHttp.Server) {
+func startHttpServer(httpServer *httpLib.Server) {
 	if err := httpServer.Start(); err != nil {
 		slog.Error("Server failed to start", "error", err)
 		os.Exit(1)

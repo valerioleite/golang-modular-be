@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	serverHttp "services/tenant/internal/server/http"
+	httpLib "libraries/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
 )
@@ -19,13 +19,13 @@ func NewGetTenantHandler(service *service.TenantService) *GetTenantHandler {
 func (h *GetTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
-		serverHttp.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"id is required"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"id is required"})
 		return
 	}
 
 	tenant, err := h.service.Get(r.Context(), id)
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 

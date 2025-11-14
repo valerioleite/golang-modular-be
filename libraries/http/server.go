@@ -1,19 +1,21 @@
-package server
+package http
 
 import (
 	"log/slog"
 	"net/http"
 	"os"
-	storageHttp "services/storage/internal/storage/delivery/http"
 )
 
-type Server struct {
-	mux    *http.ServeMux
-	router *storageHttp.Router
-	port   string
+type Router interface {
+	SetupRoutes() *http.ServeMux
 }
 
-func NewServer(router *storageHttp.Router) *Server {
+type Server struct {
+	mux  *http.ServeMux
+	port string
+}
+
+func NewServer(router Router) *Server {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -22,9 +24,8 @@ func NewServer(router *storageHttp.Router) *Server {
 	mux := router.SetupRoutes()
 
 	return &Server{
-		mux:    mux,
-		router: router,
-		port:   port,
+		mux:  mux,
+		port: port,
 	}
 }
 

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	httpLib "libraries/http"
 	"net/http"
-	serverHttp "services/tenant/internal/server/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
 )
@@ -21,13 +21,13 @@ func (h *UpdateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	var req dto.UpdateTenantRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		serverHttp.HandleErrorWithStatus(w, http.StatusBadRequest, []string{err.Error()})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{err.Error()})
 		return
 	}
 
 	tenant, err := h.service.Update(r.Context(), id, req.Name, req.Logo, req.Banner)
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 
@@ -39,8 +39,8 @@ func (h *UpdateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(response) //TODO add in http library
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 	}
 }

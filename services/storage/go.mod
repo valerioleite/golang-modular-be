@@ -30,3 +30,4 @@ require (
 )
 
 replace libraries/db => ../libraries/db
+replace libraries/http => ../libraries/http

@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	serverHttp "services/tenant/internal/server/http"
+	httpLib "libraries/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
 )
@@ -19,7 +19,7 @@ func NewListTenantHandler(service *service.TenantService) *ListTenantHandler {
 func (h *ListTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	tenants, err := h.service.List(r.Context())
 	if err != nil {
-		serverHttp.HandleError(w, err)
+		httpLib.HandleError(w, err)
 		return
 	}
 

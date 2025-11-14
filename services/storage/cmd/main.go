@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
+	httpLib "libraries/http"
 	"log/slog"
 	"os"
-	serverHttp "services/storage/internal/server"
 	storageHttp "services/storage/internal/storage/delivery/http"
 	"services/storage/internal/storage/infrastructure/s3"
 	"services/storage/internal/storage/service"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -36,7 +37,7 @@ func injectDependencies() {
 	storageRepo := s3.NewStorageRepositoryS3()
 	storageService := service.NewStorageService(storageRepo)
 	router := storageHttp.NewRouter(storageService)
-	httpServer := serverHttp.NewServer(router)
+	httpServer := httpLib.NewServer(router)
 
 	err := storageService.Init()
 	if err != nil {
@@ -47,7 +48,7 @@ func injectDependencies() {
 	startHttpServer(httpServer)
 }
 
-func startHttpServer(httpServer *serverHttp.Server) {
+func startHttpServer(httpServer *httpLib.Server) {
 	if err := httpServer.Start(); err != nil {
 		slog.Error("Server failed to start", "error", err)
 		os.Exit(1)
