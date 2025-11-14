@@ -19,16 +19,6 @@ func (h *DownloadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) 
 	bucket := r.PathValue("bucket")
 	filename := r.PathValue("filename")
 
-	if bucket == "" {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"bucket is required"})
-		return
-	}
-
-	if filename == "" {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"filename is required"})
-		return
-	}
-
 	reader, err := h.service.Download(r.Context(), bucket, filename)
 	if err != nil {
 		httpLib.HandleError(w, err)

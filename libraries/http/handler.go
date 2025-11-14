@@ -2,20 +2,19 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 )
 
 func HandleError(w http.ResponseWriter, err error) {
-	var statusCode int
-	var errorMessage string
+	statusCode := http.StatusInternalServerError
+	errorMessage := err.Error()
 
-	if httpErr, ok := err.(HTTPError); ok {
+	var httpErr Error
+	if errors.As(err, &httpErr) {
 		statusCode = httpErr.HTTPStatus()
 		errorMessage = httpErr.Error()
-	} else {
-		statusCode = http.StatusInternalServerError
-		errorMessage = err.Error()
 	}
 
 	HandleErrorWithStatus(w, statusCode, []string{errorMessage})
@@ -28,6 +27,6 @@ func HandleErrorWithStatus(w http.ResponseWriter, statusCode int, errors []strin
 		Timestamp: time.Now().UTC(),
 		Errors:    errors,
 	}
-	json.NewEncoder(w).Encode(response)
-}
 
+	_ = json.NewEncoder(w).Encode(response)
+}

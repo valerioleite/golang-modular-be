@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
 	httpLib "libraries/http"
+	"net/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
 )

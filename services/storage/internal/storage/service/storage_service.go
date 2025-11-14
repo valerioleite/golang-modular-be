@@ -22,7 +22,6 @@ func (s *StorageService) Init() error {
 
 func (s *StorageService) Upload(ctx context.Context, bucket, filename string, file multipart.File, header *multipart.FileHeader) (*domain.Storage, error) {
 	//TODO Need do it:
-	// - Create common library
 	// - Integrate with tenant service
 	// - Add settings to aws credentials
 

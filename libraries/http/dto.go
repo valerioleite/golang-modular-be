@@ -7,8 +7,7 @@ type ErrorResponse struct {
 	Errors    []string  `json:"errors"`
 }
 
-type HTTPError interface {
+type Error interface {
 	HTTPStatus() int
 	Error() string
 }
-
