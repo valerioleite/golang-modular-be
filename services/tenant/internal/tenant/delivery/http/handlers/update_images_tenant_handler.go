@@ -9,15 +9,15 @@ import (
 	"services/tenant/internal/tenant/service"
 )
 
-type UpdateImagesTenantHandler struct {
+type UpdateImageTenantHandler struct {
 	service *service.TenantService
 }
 
-func NewUpdateImagesTenantHandler(service *service.TenantService) *UpdateImagesTenantHandler {
-	return &UpdateImagesTenantHandler{service: service}
+func NewUpdateImagesTenantHandler(service *service.TenantService) *UpdateImageTenantHandler {
+	return &UpdateImageTenantHandler{service: service}
 }
 
-func (h *UpdateImagesTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (h *UpdateImageTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"failed to parse multipart form"})
 		return
@@ -30,7 +30,7 @@ func (h *UpdateImagesTenantHandler) Handle(w http.ResponseWriter, r *http.Reques
 		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"image file is required"})
 		return
 	}
-	
+
 	defer func() {
 		if file != nil {
 			_ = file.Close()
