@@ -12,19 +12,19 @@ import (
 )
 
 type TenantService struct {
-	repo        repository.TenantRepository
+	tenantRepo  repository.TenantRepository
 	storageRepo repository.StorageRepository
 }
 
 func NewTenantService(repo repository.TenantRepository, storageRepo repository.StorageRepository) *TenantService {
 	return &TenantService{
-		repo:        repo,
+		tenantRepo:  repo,
 		storageRepo: storageRepo,
 	}
 }
 
 func (s *TenantService) List(ctx context.Context) ([]*domain.Tenant, error) {
-	return s.repo.GetAll(ctx)
+	return s.tenantRepo.GetAll(ctx)
 }
 
 func (s *TenantService) Get(ctx context.Context, id string) (*domain.Tenant, error) {
@@ -33,7 +33,7 @@ func (s *TenantService) Get(ctx context.Context, id string) (*domain.Tenant, err
 		return nil, domain.ErrInvalidID
 	}
 
-	tenant, err := s.repo.GetByID(ctx, id)
+	tenant, err := s.tenantRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (s *TenantService) Create(ctx context.Context, name string) (*domain.Tenant
 		return nil, err
 	}
 
-	if err := s.repo.Create(ctx, tenant); err != nil {
+	if err := s.tenantRepo.Create(ctx, tenant); err != nil {
 		return nil, err
 	}
 
@@ -69,7 +69,7 @@ func (s *TenantService) Update(ctx context.Context, id, name string) (*domain.Te
 		return nil, err
 	}
 
-	if err := s.repo.Update(ctx, tenant); err != nil {
+	if err := s.tenantRepo.Update(ctx, tenant); err != nil {
 		return nil, err
 	}
 
@@ -115,7 +115,7 @@ func (s *TenantService) UpdateImage(ctx context.Context, id string, imageType do
 		return nil, domain.ErrInvalidImageType
 	}
 
-	if err := s.repo.Update(ctx, tenant); err != nil {
+	if err := s.tenantRepo.Update(ctx, tenant); err != nil {
 		return nil, err
 	}
 
@@ -128,7 +128,7 @@ func (s *TenantService) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	return s.repo.Delete(ctx, id)
+	return s.tenantRepo.Delete(ctx, id)
 }
 
 func (s *TenantService) validateFileType(imageType domain.ImageType, header *multipart.FileHeader) error {
