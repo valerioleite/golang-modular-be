@@ -3,15 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/google/uuid"
 	"services/tenant/internal/tenant/domain"
-	"services/tenant/internal/tenant/infrastructure/mock"
+	"services/tenant/internal/tenant/infrastructure/repository"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestTenantService_Create(t *testing.T) {
 	t.Run("should return error when name is empty", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		_, err := service.Create(nil, "", nil, nil)
 		if !errors.Is(err, domain.ErrNameRequired) {
@@ -20,7 +21,7 @@ func TestTenantService_Create(t *testing.T) {
 	})
 
 	t.Run("should create tenant successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		name := "Tenant X"
 		tenant, err := service.Create(nil, name, nil, nil)
@@ -39,7 +40,7 @@ func TestTenantService_Create(t *testing.T) {
 
 func TestTenantService_List(t *testing.T) {
 	t.Run("should return empty list successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetAllFunc = func(ctx context.Context) ([]*domain.Tenant, error) {
@@ -57,7 +58,7 @@ func TestTenantService_List(t *testing.T) {
 	})
 
 	t.Run("should return list with tenants successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetAllFunc = func(ctx context.Context) ([]*domain.Tenant, error) {
@@ -79,7 +80,7 @@ func TestTenantService_List(t *testing.T) {
 
 func TestTenantService_Get(t *testing.T) {
 	t.Run("should return error when id is empty", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		_, err := service.Get(nil, "")
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -88,7 +89,7 @@ func TestTenantService_Get(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not uuid", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		_, err := service.Get(nil, "550a5288-8e65-450c-bd2c-0028d4a1d3c")
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -97,7 +98,7 @@ func TestTenantService_Get(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not registered", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetByIdFunc = func(ctx context.Context, id string) (*domain.Tenant, error) {
@@ -111,7 +112,7 @@ func TestTenantService_Get(t *testing.T) {
 	})
 
 	t.Run("should get tenant successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		name := "Test Tenant 123"
@@ -133,7 +134,7 @@ func TestTenantService_Get(t *testing.T) {
 
 func TestTenantService_Update(t *testing.T) {
 	t.Run("should return error when id is empty", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		_, err := service.Update(nil, "", "Test Tenant 123", nil, nil)
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -142,7 +143,7 @@ func TestTenantService_Update(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not uuid", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		_, err := service.Update(nil, "550a5288-8e65-450c-bd2c-0028d4a1d3c", "Test Tenant 123", nil, nil)
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -151,7 +152,7 @@ func TestTenantService_Update(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not registered", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetByIdFunc = func(ctx context.Context, id string) (*domain.Tenant, error) {
@@ -165,7 +166,7 @@ func TestTenantService_Update(t *testing.T) {
 	})
 
 	t.Run("should delete tenant successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetByIdFunc = func(ctx context.Context, id string) (*domain.Tenant, error) {
@@ -197,7 +198,7 @@ func TestTenantService_Update(t *testing.T) {
 
 func TestTenantService_Delete(t *testing.T) {
 	t.Run("should return error when id is empty", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		err := service.Delete(nil, "")
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -206,7 +207,7 @@ func TestTenantService_Delete(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not uuid", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 		err := service.Delete(nil, "550a5288-8e65-450c-bd2c-0028d4a1d3c")
 		if !errors.Is(err, domain.ErrInvalidID) {
@@ -215,7 +216,7 @@ func TestTenantService_Delete(t *testing.T) {
 	})
 
 	t.Run("should return error when id is not registered", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetByIdFunc = func(ctx context.Context, id string) (*domain.Tenant, error) {
@@ -229,7 +230,7 @@ func TestTenantService_Delete(t *testing.T) {
 	})
 
 	t.Run("should delete tenant successfully", func(t *testing.T) {
-		repo := &mock.TenantRepository{}
+		repo := &repository.TenantRepository{}
 		service := NewTenantService(repo)
 
 		repo.GetByIdFunc = func(ctx context.Context, id string) (*domain.Tenant, error) {

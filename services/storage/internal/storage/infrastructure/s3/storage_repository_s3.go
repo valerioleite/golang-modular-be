@@ -82,11 +82,14 @@ func (r *StorageRepositoryS3) Download(ctx context.Context, storage *domain.Stor
 func (r *StorageRepositoryS3) setupS3Client() (*awsS3.Client, error) {
 	region := os.Getenv("AWS_REGION")
 	endpoint := os.Getenv("AWS_ENDPOINT")
+	key := os.Getenv("AWS_CREDENTIALS_KEY")
+	secret := os.Getenv("AWS_CREDENTIALS_SECRET")
+	session := os.Getenv("AWS_CREDENTIALS_SESSION")
 
 	cfg, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithRegion(region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(key, secret, session)),
 		//config.WithClientLogMode(aws.LogRetries|aws.LogRequest),
 	)
 

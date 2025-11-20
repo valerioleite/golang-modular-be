@@ -7,7 +7,8 @@ import (
 	"log/slog"
 	"os"
 	tenantHttp "services/tenant/internal/tenant/delivery/http"
-	"services/tenant/internal/tenant/infrastructure/db"
+	"services/tenant/internal/tenant/infrastructure/client"
+	"services/tenant/internal/tenant/infrastructure/repository"
 	"services/tenant/internal/tenant/service"
 
 	"github.com/joho/godotenv"
@@ -72,8 +73,10 @@ func runMigrations(database *dbLib.DB) {
 }
 
 func injectDependencies(database *dbLib.DB) {
-	tenantRepo := db.NewTenantRepositorySQL(database.DB)
-	tenantService := service.NewTenantService(tenantRepo)
+	storageClient := client.NewStorageClient()
+	storageRepo := repository.NewStorageRepositoryHttp(storageClient)
+	tenantRepo := repository.NewTenantRepositorySQL(database.DB)
+	tenantService := service.NewTenantService(tenantRepo, storageRepo)
 	router := tenantHttp.NewRouter(tenantService)
 	httpServer := httpLib.NewServer(router)
 

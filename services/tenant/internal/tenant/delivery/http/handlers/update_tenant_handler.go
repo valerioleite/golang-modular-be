@@ -25,7 +25,7 @@ func (h *UpdateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.service.Update(r.Context(), id, req.Name, req.Logo, req.Banner)
+	tenant, err := h.service.Update(r.Context(), id, req.Name)
 	if err != nil {
 		httpLib.HandleError(w, err)
 		return

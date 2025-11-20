@@ -21,10 +21,6 @@ func (s *StorageService) Init() error {
 }
 
 func (s *StorageService) Upload(ctx context.Context, bucket, filename string, file multipart.File, header *multipart.FileHeader) (*domain.Storage, error) {
-	//TODO Need do it:
-	// - Integrate with tenant service
-	// - Add settings to aws credentials
-
 	storage, err := domain.NewStorage(bucket, filename, file, header)
 	if err != nil {
 		return nil, err

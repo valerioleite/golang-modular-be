@@ -23,17 +23,15 @@ func (h *CreateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.service.Create(r.Context(), req.Name, nil, nil)
+	tenant, err := h.service.Create(r.Context(), req.Name)
 	if err != nil {
 		httpLib.HandleError(w, err)
 		return
 	}
 
 	response := dto.TenantResponse{
-		ID:     tenant.ID.String(),
-		Name:   tenant.Name,
-		Logo:   tenant.Logo,
-		Banner: tenant.Banner,
+		ID:   tenant.ID.String(),
+		Name: tenant.Name,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
