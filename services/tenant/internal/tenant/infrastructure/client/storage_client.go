@@ -10,6 +10,11 @@ import (
 	"net/http"
 	"os"
 	"services/tenant/internal/tenant/infrastructure/client/dto"
+	"time"
+)
+
+const (
+	uploadTimeout = 3 * time.Second
 )
 
 type StorageClient struct {
@@ -49,6 +54,9 @@ func (c *StorageClient) UploadFile(ctx context.Context, bucket, filename string,
 	if err := writer.Close(); err != nil {
 		return nil, fmt.Errorf("failed to close writer: %w", err)
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, uploadTimeout)
+	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"storage", &requestBody)
 	if err != nil {

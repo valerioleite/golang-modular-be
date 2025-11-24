@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	httpLib "libraries/http"
+	"libraries/http/json"
 	"net/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
@@ -18,8 +18,8 @@ func NewCreateTenantHandler(service *service.TenantService) *CreateTenantHandler
 
 func (h *CreateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateTenantRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{err.Error()})
+	if err := json.Read(r, &req); err != nil {
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -34,10 +34,5 @@ func (h *CreateTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		Name: tenant.Name,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		httpLib.HandleError(w, err)
-	}
+	json.Write(w, http.StatusCreated, response)
 }

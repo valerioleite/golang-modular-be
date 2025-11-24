@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	httpLib "libraries/http"
+	"libraries/http/json"
 	"net/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
@@ -23,9 +23,9 @@ func (h *ListTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses := make([]dto.TenantResponse, len(tenants))
+	response := make([]dto.TenantResponse, len(tenants))
 	for i, tenant := range tenants {
-		responses[i] = dto.TenantResponse{
+		response[i] = dto.TenantResponse{
 			ID:     tenant.ID.String(),
 			Name:   tenant.Name,
 			Logo:   tenant.Logo,
@@ -33,6 +33,5 @@ func (h *ListTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(responses)
+	json.Write(w, http.StatusOK, response)
 }

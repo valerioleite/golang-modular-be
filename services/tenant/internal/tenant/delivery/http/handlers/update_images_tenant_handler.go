@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	httpLib "libraries/http"
+	"libraries/http/json"
 	"net/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/domain"
@@ -19,7 +19,7 @@ func NewUpdateImagesTenantHandler(service *service.TenantService) *UpdateImageTe
 
 func (h *UpdateImageTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"failed to parse multipart form"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -27,7 +27,7 @@ func (h *UpdateImageTenantHandler) Handle(w http.ResponseWriter, r *http.Request
 	imageType := domain.ImageTypeFromString(r.FormValue("type"))
 	file, header, err := r.FormFile("image")
 	if err != nil {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"image file is required"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, "image file is required")
 		return
 	}
 
@@ -50,10 +50,5 @@ func (h *UpdateImageTenantHandler) Handle(w http.ResponseWriter, r *http.Request
 		Banner: tenant.Banner,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		httpLib.HandleError(w, err)
-	}
+	json.Write(w, http.StatusOK, response)
 }

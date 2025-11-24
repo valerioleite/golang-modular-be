@@ -1,32 +1,33 @@
 package http
 
 import (
-	"encoding/json"
 	"errors"
+	json "libraries/http/json"
+	"log/slog"
 	"net/http"
 	"time"
 )
 
 func HandleError(w http.ResponseWriter, err error) {
-	statusCode := http.StatusInternalServerError
+	status := http.StatusInternalServerError
 	errorMessage := err.Error()
 
 	var httpErr Error
 	if errors.As(err, &httpErr) {
-		statusCode = httpErr.HTTPStatus()
+		status = httpErr.HTTPStatus()
 		errorMessage = httpErr.Error()
+	} else {
+		slog.Error("Unexpected error occurred", "error", err)
 	}
 
-	HandleErrorWithStatus(w, statusCode, []string{errorMessage})
+	HandleErrorWithStatus(w, status, errorMessage)
 }
 
-func HandleErrorWithStatus(w http.ResponseWriter, statusCode int, errors []string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
+func HandleErrorWithStatus(w http.ResponseWriter, status int, errors string) {
 	response := ErrorResponse{
 		Timestamp: time.Now().UTC(),
-		Errors:    errors,
+		Errors:    []string{errors},
 	}
 
-	_ = json.NewEncoder(w).Encode(response)
+	json.Write(w, status, response)
 }

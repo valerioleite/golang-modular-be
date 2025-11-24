@@ -24,7 +24,10 @@ func (h *DownloadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) 
 		httpLib.HandleError(w, err)
 		return
 	}
-	defer reader.Close()
+
+	defer func(reader io.ReadCloser) {
+		_ = reader.Close()
+	}(reader)
 
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Header().Set("Content-Disposition", "attachment; filename=\""+filename+"\"")

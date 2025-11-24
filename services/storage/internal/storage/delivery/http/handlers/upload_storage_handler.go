@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	httpLib "libraries/http"
+	"libraries/http/json"
 	"mime/multipart"
 	"net/http"
 	"services/storage/internal/storage/delivery/http/dto"
@@ -19,7 +19,7 @@ func NewUploadStorageHandler(service *service.StorageService) *UploadStorageHand
 
 func (h *UploadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, []string{"failed to parse multipart form"})
+		httpLib.HandleErrorWithStatus(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -45,11 +45,5 @@ func (h *UploadStorageHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		Path:     storage.Path,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		httpLib.HandleError(w, err)
-		return
-	}
+	json.Write(w, http.StatusCreated, response)
 }

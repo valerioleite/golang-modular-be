@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	httpLib "libraries/http"
+	"libraries/http/json"
 	"net/http"
 	"services/tenant/internal/tenant/delivery/http/dto"
 	"services/tenant/internal/tenant/service"
@@ -32,6 +32,5 @@ func (h *GetTenantHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		Banner: tenant.Banner,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	json.Write(w, http.StatusOK, response)
 }
