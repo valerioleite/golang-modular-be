@@ -1,6 +1,7 @@
 package http
 
 import (
+	"libraries/http/cors"
 	"log/slog"
 	"net/http"
 	"os"
@@ -23,7 +24,7 @@ func NewServer(router Router) *Server {
 	}
 
 	mux := router.SetupRoutes()
-	handler := NewCORSHandler(mux)
+	handler := cors.NewCORSHandler(mux)
 
 	return &Server{
 		mux:     mux,

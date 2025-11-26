@@ -2,8 +2,6 @@ package oidc
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"os"
 	"services/authentication/internal/authentication/domain"
@@ -66,7 +64,7 @@ func (r *AuthenticationRepositoryOIDC) Init(ctx context.Context) error {
 	return nil
 }
 
-func (r *AuthenticationRepositoryOIDC) GetAuthorizationURL(ctx context.Context, state, redirectURI string) (string, error) {
+func (r *AuthenticationRepositoryOIDC) GetAuthorizationURL(ctx context.Context, state string) (string, error) {
 	if r.oauth2Config == nil {
 		return "", domain.ErrInvalidProvider
 	}
@@ -77,7 +75,7 @@ func (r *AuthenticationRepositoryOIDC) GetAuthorizationURL(ctx context.Context, 
 	return authURL, nil
 }
 
-func (r *AuthenticationRepositoryOIDC) ExchangeCode(ctx context.Context, code, redirectURI string) (*domain.Token, error) {
+func (r *AuthenticationRepositoryOIDC) ExchangeCode(ctx context.Context, code string) (*domain.Token, error) {
 	if r.oauth2Config == nil {
 		return nil, domain.ErrInvalidProvider
 	}
@@ -150,15 +148,7 @@ func (r *AuthenticationRepositoryOIDC) VerifyToken(ctx context.Context, token st
 		return nil, fmt.Errorf("failed to verify token: %w", err)
 	}
 
-	var claims struct {
-		Subject           string `json:"sub"`
-		Email             string `json:"email"`
-		EmailVerified     bool   `json:"email_verified"`
-		Name              string `json:"name"`
-		PreferredUsername string `json:"preferred_username"`
-		Picture           string `json:"picture"`
-	}
-
+	var claims Claims
 	if err := idToken.Claims(&claims); err != nil {
 		return nil, fmt.Errorf("failed to parse claims: %w", err)
 	}
@@ -174,44 +164,5 @@ func (r *AuthenticationRepositoryOIDC) VerifyToken(ctx context.Context, token st
 }
 
 func (r *AuthenticationRepositoryOIDC) GetUserInfo(ctx context.Context, accessToken string) (*domain.UserInfo, error) {
-	if r.provider == nil {
-		return nil, domain.ErrInvalidProvider
-	}
-
-	userInfo, err := r.provider.UserInfo(ctx, oauth2.StaticTokenSource(&oauth2.Token{
-		AccessToken: accessToken,
-	}))
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user info: %w", err)
-	}
-
-	var claims struct {
-		Subject           string `json:"sub"`
-		Email             string `json:"email"`
-		EmailVerified     bool   `json:"email_verified"`
-		Name              string `json:"name"`
-		PreferredUsername string `json:"preferred_username"`
-		Picture           string `json:"picture"`
-	}
-
-	if err := userInfo.Claims(&claims); err != nil {
-		return nil, fmt.Errorf("failed to parse user info claims: %w", err)
-	}
-
-	return &domain.UserInfo{
-		Subject:           claims.Subject,
-		Email:             claims.Email,
-		EmailVerified:     claims.EmailVerified,
-		Name:              claims.Name,
-		PreferredUsername: claims.PreferredUsername,
-		Picture:           claims.Picture,
-	}, nil
-}
-
-func GenerateState() (string, error) {
-	b := make([]byte, 32)
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(b), nil
+	return r.VerifyToken(ctx, accessToken)
 }

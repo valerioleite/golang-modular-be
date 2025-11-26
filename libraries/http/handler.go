@@ -2,7 +2,8 @@ package http
 
 import (
 	"errors"
-	json "libraries/http/json"
+	"libraries/http/dto"
+	"libraries/http/json"
 	"log/slog"
 	"net/http"
 	"time"
@@ -12,7 +13,7 @@ func HandleError(w http.ResponseWriter, err error) {
 	status := http.StatusInternalServerError
 	errorMessage := err.Error()
 
-	var httpErr Error
+	var httpErr dto.Error
 	if errors.As(err, &httpErr) {
 		status = httpErr.HTTPStatus()
 		errorMessage = httpErr.Error()
@@ -23,10 +24,10 @@ func HandleError(w http.ResponseWriter, err error) {
 	HandleErrorWithStatus(w, status, errorMessage)
 }
 
-func HandleErrorWithStatus(w http.ResponseWriter, status int, errors string) {
-	response := ErrorResponse{
+func HandleErrorWithStatus(w http.ResponseWriter, status int, error string) {
+	response := dto.ErrorResponse{
 		Timestamp: time.Now().UTC(),
-		Errors:    []string{errors},
+		Errors:    []string{error},
 	}
 
 	json.Write(w, status, response)

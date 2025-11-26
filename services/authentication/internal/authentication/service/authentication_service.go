@@ -37,7 +37,7 @@ func (s *AuthenticationService) Login(ctx context.Context, redirectURI string) (
 		return "", "", err
 	}
 
-	authURL, err := s.oidcRepo.GetAuthorizationURL(ctx, state, redirectURI)
+	authURL, err := s.oidcRepo.GetAuthorizationURL(ctx, state)
 	if err != nil {
 		return "", "", err
 	}
@@ -47,12 +47,16 @@ func (s *AuthenticationService) Login(ctx context.Context, redirectURI string) (
 	return authURL, state, nil
 }
 
-func (s *AuthenticationService) Callback(ctx context.Context, code, state, redirectURI string) (*domain.Token, error) {
+func (s *AuthenticationService) Callback(ctx context.Context, code, state string) (*domain.Token, error) {
+	if code == "" || state == "" {
+		return nil, domain.ErrMissingCodeOrState
+	}
+
 	if !s.validateState(state) {
 		return nil, domain.ErrInvalidState
 	}
 
-	token, err := s.oidcRepo.ExchangeCode(ctx, code, redirectURI)
+	token, err := s.oidcRepo.ExchangeCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}
