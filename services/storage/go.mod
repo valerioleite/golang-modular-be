@@ -29,6 +29,6 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 )
 
-replace libraries/db => ../libraries/db
-replace libraries/domain => ../libraries/domain
-replace libraries/http => ../libraries/http
+replace libraries/db => ../../libraries/db
+replace libraries/domain => ../../libraries/domain
+replace libraries/http => ../../libraries/http

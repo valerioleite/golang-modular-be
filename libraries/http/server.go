@@ -11,8 +11,9 @@ type Router interface {
 }
 
 type Server struct {
-	mux  *http.ServeMux
-	port string
+	mux     *http.ServeMux
+	handler http.Handler
+	port    string
 }
 
 func NewServer(router Router) *Server {
@@ -22,18 +23,19 @@ func NewServer(router Router) *Server {
 	}
 
 	mux := router.SetupRoutes()
+	handler := NewCORSHandler(mux)
 
 	return &Server{
-		mux:  mux,
-		port: port,
+		mux:     mux,
+		port:    port,
+		handler: handler,
 	}
 }
 
 func (s *Server) Start() error {
 	slog.Info("Server starting.", "port", s.port)
-	if err := http.ListenAndServe(":"+s.port, s.mux); err != nil {
+	if err := http.ListenAndServe(":"+s.port, s.handler); err != nil {
 		return err
 	}
 	return nil
 }
-

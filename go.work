@@ -4,6 +4,7 @@ use (
 	./libraries/db
 	./libraries/domain
 	./libraries/http
+	./services/authentication
 	./services/storage
 	./services/tenant
 )

@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// mockFile implementa multipart.File para testes
 type mockFile struct {
 	*bytes.Reader
 	closed bool
