@@ -19,7 +19,7 @@ type Router struct {
 func NewRouter(service *service.AuthenticationService, frontendURL string) *Router {
 	return &Router{
 		loginHandler:        handlers.NewLoginHandler(service),
-		callbackGetHandler:  handlers.NewCallbackGetHandler(service, frontendURL),
+		callbackGetHandler:  handlers.NewCallbackGetHandler(service),
 		callbackPostHandler: handlers.NewCallbackPostHandler(service),
 		refreshTokenHandler: handlers.NewRefreshTokenHandler(service),
 		verifyTokenHandler:  handlers.NewVerifyTokenHandler(service),

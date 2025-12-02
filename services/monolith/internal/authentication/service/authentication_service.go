@@ -52,8 +52,9 @@ func (s *AuthenticationService) Callback(ctx context.Context, code, state string
 		return nil, domain.ErrMissingCodeOrState
 	}
 
-	if !s.validateState(state) {
-		return nil, domain.ErrInvalidState
+	_, err := s.getState(state)
+	if err != nil {
+		return nil, err
 	}
 
 	token, err := s.oidcRepo.ExchangeCode(ctx, code)
@@ -64,6 +65,14 @@ func (s *AuthenticationService) Callback(ctx context.Context, code, state string
 	s.removeState(state)
 
 	return token, nil
+}
+
+func (s *AuthenticationService) GetRedirectURI(state string) (string, error) {
+	authState, err := s.getState(state)
+	if err != nil {
+		return "", err
+	}
+	return authState.RedirectURI, nil
 }
 
 func (s *AuthenticationService) RefreshToken(ctx context.Context, refreshToken string) (*domain.Token, error) {
@@ -84,20 +93,20 @@ func (s *AuthenticationService) storeState(state, redirectURI string) {
 	s.states[state] = domain.NewAuthState(state, redirectURI)
 }
 
-func (s *AuthenticationService) validateState(state string) bool {
+func (s *AuthenticationService) getState(state string) (*domain.AuthState, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	authState, exists := s.states[state]
 	if !exists {
-		return false
+		return nil, domain.ErrInvalidState
 	}
 
 	if authState.IsExpired(10 * time.Minute) {
-		return false
+		return nil, domain.ErrInvalidState
 	}
 
-	return true
+	return authState, nil
 }
 
 func (s *AuthenticationService) removeState(state string) {
