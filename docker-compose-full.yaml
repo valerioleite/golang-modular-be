@@ -21,6 +21,7 @@ services:
       retries: 5
 
   hr-app-monolith:
+    image: ghcr.io/vai-tech-portugal/hr-app-monolith:dev
     container_name: hr-app-monolith
     environment:
       OIDC_ISSUER_URL: https://dev-tb1ikdhvif2i04ri.us.auth0.com/
