@@ -36,8 +36,7 @@ func main() {
 func setupEnvFile() {
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error(".env file not found")
-		os.Exit(1)
+		slog.Warn(".env file not found")
 	}
 }
 
@@ -83,10 +82,6 @@ func runMigrations(database *dbLib.DB) {
 func injectDependencies(database *dbLib.DB) *httpLib.Server {
 	oidcRepo := oidc.NewOIDCRepository()
 	authSvc := authService.NewAuthenticationService(oidcRepo)
-	frontendURL := os.Getenv("FRONTEND_URL")
-	if frontendURL == "" {
-		frontendURL = "http://localhost:3000"
-	}
 
 	storageRepo := s3.NewStorageRepositoryS3()
 	storageSvc := storageService.NewStorageService(storageRepo)
@@ -109,7 +104,7 @@ func injectDependencies(database *dbLib.DB) *httpLib.Server {
 		os.Exit(1)
 	}
 
-	authRouter := authHttp.NewRouter(authSvc, frontendURL)
+	authRouter := authHttp.NewRouter(authSvc)
 	tenantRouter := tenantHttp.NewRouter(tenantSvc)
 	storageRouter := storageHttp.NewRouter(storageSvc)
 	router := NewRouter(authRouter, tenantRouter, storageRouter)

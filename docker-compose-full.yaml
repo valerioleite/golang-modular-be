@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  hr-app-postgres:
+    image: postgres:18-alpine
+    container_name: hr-app-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - hr-app-postgres-data:/var/lib/postgresql/data
+    networks:
+      - hr-app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hr-app-monolith:
+    container_name: hr-app-monolith
+    environment:
+      OIDC_ISSUER_URL: https://dev-tb1ikdhvif2i04ri.us.auth0.com/
+      OIDC_CLIENT_ID: z8yvKmajQXUAf80Xk39hSdtVACImHzd4
+      OIDC_CLIENT_SECRET: lvR45uaVLCkJO11DOjny4segBbF_v2sfUGhUOVtDkkzotzSzhmJxzOeBqqQHmNxt
+      OIDC_REDIRECT_URI: http://localhost:8080/auth/callback
+      FRONTEND_URL: http://localhost:3000
+      AWS_REGION: us-east-1
+      AWS_ENDPOINT: http://host.docker.internal:4566
+      AWS_CREDENTIALS_KEY: test
+      AWS_CREDENTIALS_SECRET: test
+      DATABASE_HOST: hr-app-postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_DB: postgres
+      DATABASE_SSL_MODE: disable
+      STORAGE_BASE_URL: http://localhost:8080/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:8080"
+    networks:
+      - hr-app-network
+    depends_on:
+      hr-app-postgres:
+        condition: service_healthy
+
+networks:
+  hr-app-network:
+    driver: bridge
+
+volumes:
+  hr-app-postgres-data:

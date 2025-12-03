@@ -16,7 +16,7 @@ type Router struct {
 	userInfoHandler     *handlers.UserInfoHandler
 }
 
-func NewRouter(service *service.AuthenticationService, frontendURL string) *Router {
+func NewRouter(service *service.AuthenticationService) *Router {
 	return &Router{
 		loginHandler:        handlers.NewLoginHandler(service),
 		callbackGetHandler:  handlers.NewCallbackGetHandler(service),
