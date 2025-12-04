@@ -5,8 +5,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AuthURL string `json:"auth_url"`
-	State   string `json:"state"`
+	AuthURL *string `json:"auth_url"`
 }
 
 type CallbackRequest struct {
@@ -39,4 +38,3 @@ type UserInfoResponse struct {
 	PreferredUsername string `json:"preferred_username"`
 	Picture           string `json:"picture"`
 }
-

@@ -31,20 +31,20 @@ func (s *AuthenticationService) Init(ctx context.Context) error {
 	return s.oidcRepo.Init(ctx)
 }
 
-func (s *AuthenticationService) Login(ctx context.Context, redirectURI string) (string, string, error) {
+func (s *AuthenticationService) Login(ctx context.Context, redirectURI string) (*string, error) {
 	state, err := generateState()
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
 	authURL, err := s.oidcRepo.GetAuthorizationURL(ctx, state)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
 	s.storeState(state, redirectURI)
 
-	return authURL, state, nil
+	return &authURL, nil
 }
 
 func (s *AuthenticationService) Callback(ctx context.Context, code, state string) (*domain.Token, error) {

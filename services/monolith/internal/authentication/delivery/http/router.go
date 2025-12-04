@@ -8,7 +8,7 @@ import (
 )
 
 type Router struct {
-	loginHandler        *handlers.LoginHandler
+	loginHandler        *handlers.AuthorizeHandler
 	callbackGetHandler  *handlers.CallbackGetHandler
 	callbackPostHandler *handlers.CallbackPostHandler
 	refreshTokenHandler *handlers.RefreshTokenHandler
@@ -18,7 +18,7 @@ type Router struct {
 
 func NewRouter(service *service.AuthenticationService) *Router {
 	return &Router{
-		loginHandler:        handlers.NewLoginHandler(service),
+		loginHandler:        handlers.NewAuthorizeHandler(service),
 		callbackGetHandler:  handlers.NewCallbackGetHandler(service),
 		callbackPostHandler: handlers.NewCallbackPostHandler(service),
 		refreshTokenHandler: handlers.NewRefreshTokenHandler(service),
@@ -30,7 +30,7 @@ func NewRouter(service *service.AuthenticationService) *Router {
 func (r *Router) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /auth/login", r.loginHandler.Handle)
+	mux.HandleFunc("GET /auth/authorize", r.loginHandler.Handle)
 	mux.HandleFunc("GET /auth/callback", r.callbackGetHandler.Handle)
 	mux.HandleFunc("POST /auth/callback", r.callbackPostHandler.Handle)
 	mux.HandleFunc("POST /auth/refresh", r.refreshTokenHandler.Handle)
