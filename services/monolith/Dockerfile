@@ -6,7 +6,7 @@ WORKDIR /build
 
 COPY go.work go.work.sum ./
 COPY libraries/ ./libraries/
-COPY services/monolith/ ./services/monolith/
+COPY services/ ./services/
 
 WORKDIR /build/services/monolith
 
