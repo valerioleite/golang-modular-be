@@ -7,16 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	authHttp "services/monolith/internal/authentication/delivery/http"
-	"services/monolith/internal/authentication/infrastructure/oidc"
-	authService "services/monolith/internal/authentication/service"
-	storageHttp "services/monolith/internal/storage/delivery/http"
-	"services/monolith/internal/storage/infrastructure/s3"
-	storageService "services/monolith/internal/storage/service"
-	tenantHttp "services/monolith/internal/tenant/delivery/http"
-	"services/monolith/internal/tenant/infrastructure/client"
-	"services/monolith/internal/tenant/infrastructure/repository"
-	tenantService "services/monolith/internal/tenant/service"
+	"services/authentication"
+	"services/storage"
+	"services/tenant"
 
 	"github.com/joho/godotenv"
 )
@@ -34,10 +27,7 @@ func main() {
 }
 
 func setupEnvFile() {
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn(".env file not found")
-	}
+	_ = godotenv.Load()
 }
 
 func setupLogger() {
@@ -56,7 +46,7 @@ func setupDatabase() *dbLib.DB {
 		os.Exit(1)
 	}
 
-	slog.Info("Database connection established successfully.")
+	slog.Info("Database connection established successfully")
 	return database
 }
 
@@ -76,38 +66,31 @@ func runMigrations(database *dbLib.DB) {
 		os.Exit(1)
 	}
 
-	slog.Info("Migrations executed successfully.")
+	slog.Info("Migrations executed successfully")
 }
 
 func injectDependencies(database *dbLib.DB) *httpLib.Server {
-	oidcRepo := oidc.NewOIDCRepository()
-	authSvc := authService.NewAuthenticationService(oidcRepo)
-
-	storageRepo := s3.NewStorageRepositoryS3()
-	storageSvc := storageService.NewStorageService(storageRepo)
-
-	storageClient := client.NewStorageClient()
-	storageRepoHttp := repository.NewStorageRepositoryHttp(storageClient)
-	tenantRepo := repository.NewTenantRepositorySQL(database.DB)
-	tenantSvc := tenantService.NewTenantService(tenantRepo, storageRepoHttp)
-
 	ctx := context.Background()
-	err := authSvc.Init(ctx)
+
+	authModule, err := authentication.NewModule(ctx)
 	if err != nil {
-		slog.Error("Failed to initialize OIDC provider", "error", err)
+		slog.Error("Failed to initialize authentication module", "error", err)
 		os.Exit(1)
 	}
 
-	err = storageSvc.Init()
+	storageModule, err := storage.NewModule(ctx)
 	if err != nil {
-		slog.Error("Failed to load AWS config", "error", err)
+		slog.Error("Failed to initialize storage module", "error", err)
 		os.Exit(1)
 	}
 
-	authRouter := authHttp.NewRouter(authSvc)
-	tenantRouter := tenantHttp.NewRouter(tenantSvc)
-	storageRouter := storageHttp.NewRouter(storageSvc)
-	router := NewRouter(authRouter, tenantRouter, storageRouter)
+	tenantModule, err := tenant.NewModule(ctx, database.DB)
+	if err != nil {
+		slog.Error("Failed to initialize tenant module", "error", err)
+		os.Exit(1)
+	}
+
+	router := NewRouter(authModule.Router(), tenantModule.Router(), storageModule.Router())
 
 	return httpLib.NewServer(router)
 }

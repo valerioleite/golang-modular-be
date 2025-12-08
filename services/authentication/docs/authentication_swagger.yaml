@@ -1,0 +1,266 @@
+basePath: /api/authentication
+definitions:
+  CallbackRequest:
+    properties:
+      code:
+        type: string
+      redirect_uri:
+        type: string
+      state:
+        type: string
+    type: object
+  ErrorResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      timestamp:
+        type: string
+    type: object
+  HealthResponse:
+    properties:
+      module:
+        type: string
+      status:
+        type: string
+    type: object
+  LoginResponse:
+    properties:
+      auth_url:
+        type: string
+    type: object
+  RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      id_token:
+        type: string
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  UserInfoResponse:
+    properties:
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      name:
+        type: string
+      picture:
+        type: string
+      preferred_username:
+        type: string
+      sub:
+        type: string
+    type: object
+  VerifyTokenRequest:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Authentication API
+  version: "1.0"
+paths:
+  /v1/actuator/health:
+    get:
+      description: Returns the health status of the authentication module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/HealthResponse'
+      summary: Health check
+      tags:
+      - Actuator
+  /v1/authentication/authorize:
+    get:
+      consumes:
+      - application/json
+      description: Initiates the OAuth/OIDC authorization process and returns the
+        authorization URL.
+      parameters:
+      - description: Redirect URI after authentication
+        in: query
+        name: redirect_uri
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Start OAuth/OIDC authorization flow
+      tags:
+      - Authentication
+  /v1/authentication/callback:
+    get:
+      description: Handles OAuth provider callback and redirects to frontend with
+        tokens in URL fragment.
+      parameters:
+      - description: Authorization code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter
+        in: query
+        name: state
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Redirect with error
+          schema:
+            type: string
+      summary: OAuth callback handler (browser redirect)
+      tags:
+      - Authentication
+    post:
+      consumes:
+      - application/json
+      description: Exchanges authorization code for tokens via API request.
+      parameters:
+      - description: Callback request with code and state
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/CallbackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: OAuth callback handler (API)
+      tags:
+      - Authentication
+  /v1/authentication/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Exchanges refresh token for new access token.
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Authentication
+  /v1/authentication/userinfo:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves user information from access token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserInfoResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user information
+      tags:
+      - Authentication
+  /v1/authentication/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies ID token and returns user information.
+      parameters:
+      - description: Token verification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/VerifyTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Verify ID token
+      tags:
+      - Authentication
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -34,7 +34,7 @@ func NewServer(router Router) *Server {
 }
 
 func (s *Server) Start() error {
-	slog.Info("Server starting.", "port", s.port)
+	slog.Info("Server starting", "port", s.port)
 	if err := http.ListenAndServe(":"+s.port, s.handler); err != nil {
 		return err
 	}

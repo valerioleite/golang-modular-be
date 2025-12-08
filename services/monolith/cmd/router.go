@@ -4,9 +4,9 @@ import (
 	"libraries/domain"
 	httpLib "libraries/http"
 	"net/http"
-	authHttp "services/monolith/internal/authentication/delivery/http"
-	storageHttp "services/monolith/internal/storage/delivery/http"
-	tenantHttp "services/monolith/internal/tenant/delivery/http"
+	authHttp "services/authentication/delivery/http"
+	storageHttp "services/storage/delivery/http"
+	tenantHttp "services/tenant/delivery/http"
 )
 
 type Router struct {

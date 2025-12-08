@@ -1,0 +1,123 @@
+basePath: /api/storage
+definitions:
+  ErrorResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      timestamp:
+        type: string
+    type: object
+  HealthResponse:
+    properties:
+      module:
+        type: string
+      status:
+        type: string
+    type: object
+  StorageResponse:
+    properties:
+      bucket:
+        type: string
+      filename:
+        type: string
+      path:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Storage API
+  version: "1.0"
+paths:
+  /v1/actuator/health:
+    get:
+      description: Returns the health status of the storage module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/HealthResponse'
+      summary: Health check
+      tags:
+      - Actuator
+  /v1/files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a file to the specified bucket.
+      parameters:
+      - description: Bucket name
+        in: formData
+        name: bucket
+        required: true
+        type: string
+      - description: File name
+        in: formData
+        name: filename
+        required: true
+        type: string
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/StorageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Upload file to storage
+      tags:
+      - Storage
+  /v1/files/{bucket}/{filename}:
+    get:
+      description: Downloads a file from the specified bucket.
+      parameters:
+      - description: Bucket name
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: File name
+        in: path
+        name: filename
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: File content
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Download file from storage
+      tags:
+      - Storage
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
