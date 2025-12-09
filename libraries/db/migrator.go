@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -135,6 +136,18 @@ func (m *Migrator) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get applied migrations: %w", err)
 	}
 
+	if len(applied) == 0 {
+		slog.Info("Current migration version", "version", "none (fresh database)")
+	} else {
+		var maxVersion int
+		for version := range applied {
+			if version > maxVersion {
+				maxVersion = version
+			}
+		}
+		slog.Info("Current migration version", "version", maxVersion)
+	}
+
 	files, err := m.getMigrationFiles()
 	if err != nil {
 		return fmt.Errorf("failed to get migration files: %w", err)
@@ -186,6 +199,8 @@ func (m *Migrator) Run(ctx context.Context) error {
 		if err := tx.Commit(); err != nil {
 			return fmt.Errorf("failed to commit migration %s: %w", filename, err)
 		}
+
+		slog.Info("Applied migration", "filename", filename)
 	}
 
 	return nil

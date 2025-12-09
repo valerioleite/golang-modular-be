@@ -5,7 +5,8 @@ use (
 	./libraries/domain
 	./libraries/http
 	./services/authentication
+	./services/monolith
 	./services/storage
 	./services/tenant
-	./services/monolith
+	./services/user
 )

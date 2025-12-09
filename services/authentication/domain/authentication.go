@@ -38,4 +38,3 @@ func NewAuthState(state, redirectURI string) *AuthState {
 func (a *AuthState) IsExpired(maxAge time.Duration) bool {
 	return time.Since(a.CreatedAt) > maxAge
 }
-

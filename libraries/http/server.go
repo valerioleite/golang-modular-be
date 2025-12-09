@@ -38,5 +38,6 @@ func (s *Server) Start() error {
 	if err := http.ListenAndServe(":"+s.port, s.handler); err != nil {
 		return err
 	}
+	
 	return nil
 }

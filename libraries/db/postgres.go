@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
 
@@ -88,7 +87,6 @@ func (c *Config) dataSourceName() string {
 }
 
 func (c *Config) Connect() (*DB, error) {
-	slog.Info("Connecting to database", "dsn", c.dataSourceName())
 	db, err := sql.Open("postgres", c.dataSourceName())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)

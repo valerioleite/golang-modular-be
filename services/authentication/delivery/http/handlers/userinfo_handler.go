@@ -39,19 +39,17 @@ func (h *UserInfoHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		accessToken = authHeader[7:]
 	}
 
-	userInfo, err := h.service.GetUserInfo(r.Context(), accessToken)
+	user, err := h.service.GetUserInfo(r.Context(), accessToken)
 	if err != nil {
 		httpLib.HandleError(w, err)
 		return
 	}
 
 	response := dto.UserInfoResponse{
-		Subject:           userInfo.Subject,
-		Email:             userInfo.Email,
-		EmailVerified:     userInfo.EmailVerified,
-		Name:              userInfo.Name,
-		PreferredUsername: userInfo.PreferredUsername,
-		Picture:           userInfo.Picture,
+		Subject:  user.Sub,
+		Email:    user.Email,
+		Name:     user.Name,
+		Username: user.Username,
 	}
 
 	json.Write(w, http.StatusOK, response)

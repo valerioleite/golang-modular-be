@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	dbLib "libraries/db"
 	httpLib "libraries/http"
 	"log/slog"
@@ -10,11 +11,15 @@ import (
 	"services/authentication"
 	"services/storage"
 	"services/tenant"
+	"services/user"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	startTime := time.Now()
+
 	setupLogger()
 	setupEnvFile()
 
@@ -23,11 +28,19 @@ func main() {
 	runMigrations(database)
 
 	httpServer := injectDependencies(database)
+
+	elapsed := time.Since(startTime).Seconds()
+	slog.Info("Server initialized successfully", "time", fmt.Sprintf("%.3fs", elapsed))
+
 	startHttpServer(httpServer)
 }
 
 func setupEnvFile() {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		slog.Error("Failed to load environment file", "error", err)
+		// os.Exit(1)
+	}
 }
 
 func setupLogger() {
@@ -90,7 +103,13 @@ func injectDependencies(database *dbLib.DB) *httpLib.Server {
 		os.Exit(1)
 	}
 
-	router := NewRouter(authModule.Router(), tenantModule.Router(), storageModule.Router())
+	userModule, err := user.NewModule(ctx, database.DB)
+	if err != nil {
+		slog.Error("Failed to initialize user module", "error", err)
+		os.Exit(1)
+	}
+
+	router := NewRouter(authModule.Router(), tenantModule.Router(), storageModule.Router(), userModule.Router())
 
 	return httpLib.NewServer(router)
 }

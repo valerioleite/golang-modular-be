@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	jwtMiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 )
@@ -44,9 +44,9 @@ func HandleWithValidateToken(handlerFunc http.HandlerFunc) http.Handler {
 		httpLib.HandleErrorWithStatus(w, http.StatusUnauthorized, "failed to validate JWT")
 	}
 
-	middleware := jwtmiddleware.New(
+	middleware := jwtMiddleware.New(
 		jwtValidator.ValidateToken,
-		jwtmiddleware.WithErrorHandler(errorHandler),
+		jwtMiddleware.WithErrorHandler(errorHandler),
 	)
 
 	return middleware.CheckJWT(handlerFunc)

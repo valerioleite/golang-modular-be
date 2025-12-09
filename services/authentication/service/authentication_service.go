@@ -12,13 +12,15 @@ import (
 
 type AuthenticationService struct {
 	oidcRepo repository.AuthenticationRepository
+	userRepo repository.UserRepository
 	states   map[string]*domain.AuthState
 	mu       sync.RWMutex
 }
 
-func NewAuthenticationService(oidcRepo repository.AuthenticationRepository) *AuthenticationService {
+func NewAuthenticationService(oidcRepo repository.AuthenticationRepository, userRepo repository.UserRepository) *AuthenticationService {
 	service := &AuthenticationService{
 		oidcRepo: oidcRepo,
+		userRepo: userRepo,
 		states:   make(map[string]*domain.AuthState),
 	}
 
@@ -31,7 +33,7 @@ func (s *AuthenticationService) Init(ctx context.Context) error {
 	return s.oidcRepo.Init(ctx)
 }
 
-func (s *AuthenticationService) Login(ctx context.Context, redirectURI string) (*string, error) {
+func (s *AuthenticationService) Authorize(ctx context.Context, redirectURI string) (*string, error) {
 	state, err := generateState()
 	if err != nil {
 		return nil, err
@@ -64,6 +66,24 @@ func (s *AuthenticationService) Callback(ctx context.Context, code, state string
 
 	s.removeState(state)
 
+	userInfo, err := s.oidcRepo.GetUserInfo(ctx, token.IDToken)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userRepo.GetBySub(ctx, userInfo.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		newUser := domain.UserInfoToUser(userInfo)
+		_, err := s.userRepo.Create(ctx, newUser)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return token, nil
 }
 
@@ -83,8 +103,22 @@ func (s *AuthenticationService) VerifyToken(ctx context.Context, token string) (
 	return s.oidcRepo.VerifyToken(ctx, token)
 }
 
-func (s *AuthenticationService) GetUserInfo(ctx context.Context, accessToken string) (*domain.UserInfo, error) {
-	return s.oidcRepo.GetUserInfo(ctx, accessToken)
+func (s *AuthenticationService) GetUserInfo(ctx context.Context, accessToken string) (*domain.User, error) {
+	userInfo, err := s.oidcRepo.VerifyToken(ctx, accessToken)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userRepo.GetBySub(ctx, userInfo.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, domain.ErrUserNotFound
+	}
+
+	return user, nil
 }
 
 func (s *AuthenticationService) storeState(state, redirectURI string) {
@@ -121,14 +155,12 @@ func (s *AuthenticationService) cleanupExpiredStates() {
 
 	for range ticker.C {
 		s.mu.Lock()
-		now := time.Now()
 		for state, authState := range s.states {
 			if authState.IsExpired(10 * time.Minute) {
 				delete(s.states, state)
 			}
 		}
 		s.mu.Unlock()
-		_ = now
 	}
 }
 

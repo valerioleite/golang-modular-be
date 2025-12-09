@@ -7,6 +7,7 @@ import (
 var (
 	ErrNotFound      = errors.New("not found")
 	ErrInvalidFields = errors.New("invalid fields")
+	ErrConflict      = errors.New("conflict")
 )
 
 type Error struct {
@@ -28,6 +29,9 @@ func (e *Error) HTTPStatus() int {
 	if errors.Is(e.BaseError, ErrInvalidFields) {
 		return 400
 	}
+	if errors.Is(e.BaseError, ErrConflict) {
+		return 409
+	}
 	return 500
 }
 
@@ -41,6 +45,13 @@ func NewNotFoundError(message string) *Error {
 func NewInvalidFieldsError(message string) *Error {
 	return &Error{
 		BaseError: ErrInvalidFields,
+		Message:   message,
+	}
+}
+
+func NewConflictError(message string) *Error {
+	return &Error{
+		BaseError: ErrConflict,
 		Message:   message,
 	}
 }

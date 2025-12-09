@@ -4,7 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"services/authentication/delivery/http"
+	"services/authentication/infrastructure/client"
 	"services/authentication/infrastructure/oidc"
+	infraRepo "services/authentication/infrastructure/repository"
 	"services/authentication/service"
 )
 
@@ -22,7 +24,11 @@ type Module struct {
 
 func NewModule(ctx context.Context) (*Module, error) {
 	oidcRepo := oidc.NewOIDCRepository()
-	authSvc := service.NewAuthenticationService(oidcRepo)
+
+	userClient := client.NewUserClient()
+	userRepo := infraRepo.NewUserRepositoryHttp(userClient)
+
+	authSvc := service.NewAuthenticationService(oidcRepo, userRepo)
 
 	if err := authSvc.Init(ctx); err != nil {
 		return nil, err

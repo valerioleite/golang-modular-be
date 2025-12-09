@@ -1,0 +1,15 @@
+linters-settings:
+  staticcheck:
+    checks:
+      - "-ST1000"  # Disable package comment requirement
+
+linters:
+  enable:
+    - staticcheck
+
+issues:
+  exclude-rules:
+    - linters:
+        - staticcheck
+      text: "ST1000"
+

@@ -7,4 +7,5 @@ var (
 	ErrInvalidProvider    = domainLib.NewInvalidFieldsError("invalid OIDC provider configuration")
 	ErrMissingCodeOrState = domainLib.NewInvalidFieldsError("missing code or state parameter")
 	ErrInvalidState       = domainLib.NewInvalidFieldsError("invalid state parameter")
+	ErrUserNotFound       = domainLib.NewInvalidFieldsError("user not found")
 )

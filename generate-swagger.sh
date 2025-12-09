@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULES=("authentication" "storage" "tenant")
+MODULES=("authentication" "storage" "tenant" "user")
 
 echo "Start swagger generated."
 

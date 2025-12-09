@@ -1,0 +1,131 @@
+basePath: /api/user
+definitions:
+  ErrorResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      timestamp:
+        type: string
+    type: object
+  UserResponse:
+    properties:
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      sub:
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      sub:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: User API
+  version: "1.0"
+paths:
+  /v1/actuator/health:
+    get:
+      description: Returns the health status of the user module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - Actuator
+  /v1/users:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user.
+      parameters:
+      - description: Create user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create user
+      tags:
+      - User
+  /v1/users/sub/{sub}:
+    get:
+      description: Retrieves a user by their sub (subject identifier).
+      parameters:
+      - description: User sub
+        in: path
+        name: sub
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get user by sub
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

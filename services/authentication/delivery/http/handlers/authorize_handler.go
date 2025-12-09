@@ -34,7 +34,7 @@ func (h *AuthorizeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authURL, err := h.service.Login(r.Context(), redirectURI)
+	authURL, err := h.service.Authorize(r.Context(), redirectURI)
 	if err != nil {
 		httpLib.HandleError(w, err)
 		return

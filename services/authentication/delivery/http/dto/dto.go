@@ -31,10 +31,8 @@ type VerifyTokenRequest struct {
 } //@name VerifyTokenRequest
 
 type UserInfoResponse struct {
-	Subject           string `json:"sub"`
-	Email             string `json:"email"`
-	EmailVerified     bool   `json:"email_verified"`
-	Name              string `json:"name"`
-	PreferredUsername string `json:"preferred_username"`
-	Picture           string `json:"picture"`
+	Subject  string  `json:"sub"`
+	Email    string  `json:"email"`
+	Name     string  `json:"name"`
+	Username *string `json:"username,omitempty"`
 } //@name UserInfoResponse

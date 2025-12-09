@@ -42,12 +42,10 @@ func (h *VerifyTokenHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := dto.UserInfoResponse{
-		Subject:           userInfo.Subject,
-		Email:             userInfo.Email,
-		EmailVerified:     userInfo.EmailVerified,
-		Name:              userInfo.Name,
-		PreferredUsername: userInfo.PreferredUsername,
-		Picture:           userInfo.Picture,
+		Subject:  userInfo.Subject,
+		Email:    userInfo.Email,
+		Name:     userInfo.Name,
+		Username: &userInfo.PreferredUsername,
 	}
 
 	json.Write(w, http.StatusOK, response)
