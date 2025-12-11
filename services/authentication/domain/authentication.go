@@ -17,6 +17,8 @@ type UserInfo struct {
 	Email             string
 	EmailVerified     bool
 	Name              string
+	GivenName         string
+	FamilyName        string
 	PreferredUsername string
 	Picture           string
 }

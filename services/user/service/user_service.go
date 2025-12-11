@@ -16,7 +16,7 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	}
 }
 
-func (s *UserService) Create(ctx context.Context, createdBy, sub, email, name string, username *string) (*domain.User, error) {
+func (s *UserService) Create(ctx context.Context, createdBy, sub, email string, username, firstName, lastName *string) (*domain.User, error) {
 	existingUser, err := s.userRepo.GetBySub(ctx, sub)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (s *UserService) Create(ctx context.Context, createdBy, sub, email, name st
 		return nil, domain.ErrUserAlreadyExists
 	}
 
-	user, err := domain.NewUser(createdBy, sub, email, name, username)
+	user, err := domain.NewUser(createdBy, sub, email, username, firstName, lastName)
 	if err != nil {
 		return nil, err
 	}

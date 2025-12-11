@@ -26,13 +26,10 @@ type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token"`
 } //@name RefreshTokenRequest
 
-type VerifyTokenRequest struct {
-	Token string `json:"token"`
-} //@name VerifyTokenRequest
-
 type UserInfoResponse struct {
-	Subject  string  `json:"sub"`
-	Email    string  `json:"email"`
-	Name     string  `json:"name"`
-	Username *string `json:"username,omitempty"`
+	Sub       string  `json:"sub"`
+	Email     string  `json:"email"`
+	Username  *string `json:"username,omitempty"`
+	FirstName *string `json:"first_name,omitempty"`
+	LastName  *string `json:"last_name,omitempty"`
 } //@name UserInfoResponse

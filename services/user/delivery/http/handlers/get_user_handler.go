@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"services/user/delivery/http/dto"
 	"services/user/service"
+	"time"
 )
 
 type GetUserHandler struct {
@@ -38,13 +39,14 @@ func (h *GetUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	response := dto.UserResponse{
 		ID:        user.ID.String(),
 		CreatedBy: user.CreatedBy,
-		CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		UpdatedBy: user.UpdatedBy,
-		UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
 		Sub:       user.Sub,
 		Email:     user.Email,
-		Name:      user.Name,
 		Username:  user.Username,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	json.Write(w, http.StatusOK, response)

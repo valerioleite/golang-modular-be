@@ -7,7 +7,6 @@ import (
 var (
 	ErrSubRequired       = domainLib.NewInvalidFieldsError("sub is required")
 	ErrEmailRequired     = domainLib.NewInvalidFieldsError("email is required")
-	ErrNameRequired      = domainLib.NewInvalidFieldsError("name is required")
 	ErrInvalidID         = domainLib.NewInvalidFieldsError("invalid id")
 	ErrUserNotFound      = domainLib.NewNotFoundError("user not found")
 	ErrUserAlreadyExists = domainLib.NewConflictError("user already exists")

@@ -66,7 +66,7 @@ func (s *AuthenticationService) Callback(ctx context.Context, code, state string
 
 	s.removeState(state)
 
-	userInfo, err := s.oidcRepo.GetUserInfo(ctx, token.IDToken)
+	userInfo, err := s.oidcRepo.VerifyToken(ctx, token.IDToken)
 	if err != nil {
 		return nil, err
 	}

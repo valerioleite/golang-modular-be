@@ -3,6 +3,7 @@ package handlers
 import (
 	httpLib "libraries/http"
 	"libraries/http/json"
+	"libraries/http/middleware"
 	"net/http"
 	"services/authentication/delivery/http/dto"
 	"services/authentication/service"
@@ -28,16 +29,7 @@ func NewUserInfoHandler(service *service.AuthenticationService) *UserInfoHandler
 // @Router /v1/authentication/userinfo [get]
 // @Security BearerAuth
 func (h *UserInfoHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		httpLib.HandleErrorWithStatus(w, http.StatusUnauthorized, "missing authorization header")
-		return
-	}
-
-	accessToken := authHeader
-	if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
-		accessToken = authHeader[7:]
-	}
+	accessToken := middleware.GetAccessToken(r.Context())
 
 	user, err := h.service.GetUserInfo(r.Context(), accessToken)
 	if err != nil {
@@ -46,10 +38,11 @@ func (h *UserInfoHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := dto.UserInfoResponse{
-		Subject:  user.Sub,
-		Email:    user.Email,
-		Name:     user.Name,
-		Username: user.Username,
+		Sub:       user.Sub,
+		Email:     user.Email,
+		Username:  user.Username,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	json.Write(w, http.StatusOK, response)

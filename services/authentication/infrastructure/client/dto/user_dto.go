@@ -1,21 +1,24 @@
 package dto
 
+import "time"
+
 type CreateUserRequest struct {
-	Sub      string  `json:"sub"`
-	Email    string  `json:"email"`
-	Name     string  `json:"name"`
-	Username *string `json:"username"`
+	Sub       string  `json:"sub"`
+	Email     string  `json:"email"`
+	FirstName *string `json:"first_name"`
+	LastName  *string `json:"last_name"`
+	Username  *string `json:"username"`
 }
 
 type UserResponse struct {
-	ID        string  `json:"id"`
-	CreatedBy string  `json:"createdBy"`
-	CreatedAt string  `json:"createdAt"`
-	UpdatedBy string  `json:"updatedBy"`
-	UpdatedAt string  `json:"updatedAt"`
-	Sub       string  `json:"sub"`
-	Email     string  `json:"email"`
-	Name      string  `json:"name"`
-	Username  *string `json:"username,omitempty"`
+	ID        string    `json:"id"`
+	CreatedBy string    `json:"created_by"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedBy string    `json:"updated_by"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Sub       string    `json:"sub"`
+	Email     string    `json:"email"`
+	Username  *string   `json:"username,omitempty"`
+	FirstName *string   `json:"first_name,omitempty"`
+	LastName  *string   `json:"last_name,omitempty"`
 }
-

@@ -158,11 +158,9 @@ func (r *AuthenticationRepositoryOIDC) VerifyToken(ctx context.Context, token st
 		Email:             claims.Email,
 		EmailVerified:     claims.EmailVerified,
 		Name:              claims.Name,
+		GivenName:         claims.GivenName,
+		FamilyName:        claims.FamilyName,
 		PreferredUsername: claims.PreferredUsername,
 		Picture:           claims.Picture,
 	}, nil
-}
-
-func (r *AuthenticationRepositoryOIDC) GetUserInfo(ctx context.Context, accessToken string) (*domain.UserInfo, error) {
-	return r.VerifyToken(ctx, accessToken)
 }

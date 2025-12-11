@@ -14,8 +14,9 @@ type User struct {
 	UpdatedAt time.Time
 	Sub       string
 	Email     string
-	Name      string
 	Username  *string
+	FirstName *string
+	LastName  *string
 }
 
 func UserInfoToUser(userInfo *UserInfo) *User {
@@ -33,7 +34,8 @@ func UserInfoToUser(userInfo *UserInfo) *User {
 		UpdatedAt: now,
 		Sub:       userInfo.Subject,
 		Email:     userInfo.Email,
-		Name:      userInfo.Name,
+		FirstName: &userInfo.GivenName,
+		LastName:  &userInfo.FamilyName,
 		Username:  username,
 	}
 }

@@ -52,20 +52,11 @@ definitions:
     properties:
       email:
         type: string
-      email_verified:
-        type: boolean
       name:
-        type: string
-      picture:
-        type: string
-      preferred_username:
         type: string
       sub:
         type: string
-    type: object
-  VerifyTokenRequest:
-    properties:
-      token:
+      username:
         type: string
     type: object
 info:
@@ -223,43 +214,9 @@ paths:
       summary: Get user information
       tags:
       - Authentication
-  /v1/authentication/verify:
-    post:
-      consumes:
-      - application/json
-      description: Verifies ID token and returns user information.
-      parameters:
-      - description: Token verification request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/VerifyTokenRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/UserInfoResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Verify ID token
-      tags:
-      - Authentication
 securityDefinitions:
   BearerAuth:
-    description: Type "Bearer" followed by a space and JWT token.
+    description: JWT token (include "Bearer " prefix when sending)
     in: header
     name: Authorization
     type: apiKey

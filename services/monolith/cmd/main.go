@@ -36,11 +36,7 @@ func main() {
 }
 
 func setupEnvFile() {
-	err := godotenv.Load()
-	if err != nil {
-		slog.Error("Failed to load environment file", "error", err)
-		// os.Exit(1)
-	}
+	_ = godotenv.Load()
 }
 
 func setupLogger() {

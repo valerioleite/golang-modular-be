@@ -241,58 +241,6 @@ const docTemplateauthentication = `{
                     }
                 }
             }
-        },
-        "/v1/authentication/verify": {
-            "post": {
-                "description": "Verifies ID token and returns user information.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Verify ID token",
-                "parameters": [
-                    {
-                        "description": "Token verification request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/VerifyTokenRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/UserInfoResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -377,27 +325,13 @@ const docTemplateauthentication = `{
                 "email": {
                     "type": "string"
                 },
-                "email_verified": {
-                    "type": "boolean"
-                },
                 "name": {
-                    "type": "string"
-                },
-                "picture": {
-                    "type": "string"
-                },
-                "preferred_username": {
                     "type": "string"
                 },
                 "sub": {
                     "type": "string"
-                }
-            }
-        },
-        "VerifyTokenRequest": {
-            "type": "object",
-            "properties": {
-                "token": {
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -405,7 +339,7 @@ const docTemplateauthentication = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "description": "JWT token (include \"Bearer \" prefix when sending)",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

@@ -7,7 +7,6 @@ import (
 	"services/authentication/infrastructure/client"
 	"services/authentication/infrastructure/client/dto"
 	"services/authentication/repository"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,10 +21,11 @@ func NewUserRepositoryHttp(userClient *client.UserClient) repository.UserReposit
 
 func (r *UserRepositoryHttp) Create(ctx context.Context, user *domain.User) (*domain.User, error) {
 	req := &dto.CreateUserRequest{
-		Sub:      user.Sub,
-		Email:    user.Email,
-		Name:     user.Name,
-		Username: user.Username,
+		Sub:       user.Sub,
+		Email:     user.Email,
+		Username:  user.Username,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	resp, err := r.client.CreateUser(ctx, req)
@@ -55,25 +55,16 @@ func (r *UserRepositoryHttp) mapResponseToDomain(resp *dto.UserResponse) (*domai
 		return nil, fmt.Errorf("failed to parse user ID: %w", err)
 	}
 
-	createdAt, err := time.Parse("2006-01-02T15:04:05Z07:00", resp.CreatedAt)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse created at: %w", err)
-	}
-
-	updatedAt, err := time.Parse("2006-01-02T15:04:05Z07:00", resp.UpdatedAt)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse updated at: %w", err)
-	}
-
 	return &domain.User{
 		ID:        id,
 		CreatedBy: resp.CreatedBy,
-		CreatedAt: createdAt,
+		CreatedAt: resp.CreatedAt,
 		UpdatedBy: resp.UpdatedBy,
-		UpdatedAt: updatedAt,
+		UpdatedAt: resp.UpdatedAt,
 		Sub:       resp.Sub,
 		Email:     resp.Email,
-		Name:      resp.Name,
 		Username:  resp.Username,
+		FirstName: resp.FirstName,
+		LastName:  resp.LastName,
 	}, nil
 }

@@ -27,7 +27,7 @@ func NewModule(ctx context.Context, db *sql.DB) (*Module, error) {
 
 	router := http.NewRouter(userSvc)
 
-	slog.Info("User module initialized successfully", "module", "user")
+	slog.Info("User module initialized successfully")
 
 	return &Module{
 		router: router,

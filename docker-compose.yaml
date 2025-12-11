@@ -12,6 +12,39 @@ services:
       - "5432:5432"
     volumes:
       - hr-app-postgres-data:/var/lib/postgresql/data
+    networks:
+      - hr-app-network
+
+  hr-app-gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: hr-app-gateway
+    restart: on-failure
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PLUGINS: bundled,correlation-id,file-log,request-transformer,token-validator
+      AUTHENTICATION_SERVICE_URL: "http://host.docker.internal:8081"
+      USER_SERVICE_URL: "http://host.docker.internal:8080"
+    volumes:
+      - ./gateway/kong.yml:/usr/local/kong/kong.yml.source:ro
+    networks:
+      - hr-app-network
 
 volumes:
   hr-app-postgres-data:
+
+networks:
+  hr-app-network:
+    driver: bridge

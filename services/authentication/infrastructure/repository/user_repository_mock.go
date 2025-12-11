@@ -32,7 +32,7 @@ func (m *UserRepositoryMock) Create(ctx context.Context, user *domain.User) (*do
 		UpdatedAt: now,
 		Sub:       user.Sub,
 		Email:     user.Email,
-		Name:      user.Name,
+		FirstName: user.FirstName,
 		Username:  user.Username,
 	}, nil
 }
@@ -51,8 +51,8 @@ func (m *UserRepositoryMock) GetBySub(ctx context.Context, sub string) (*domain.
 		UpdatedAt: now,
 		Sub:       sub,
 		Email:     "test@example.com",
-		Name:      "Test User",
 		Username:  nil,
+		FirstName: nil,
+		LastName:  nil,
 	}, nil
 }
-

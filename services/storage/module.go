@@ -30,7 +30,7 @@ func NewModule(ctx context.Context) (*Module, error) {
 
 	router := http.NewRouter(storageSvc)
 
-	slog.Info("Storage module initialized successfully", "module", "storage")
+	slog.Info("Storage module initialized successfully")
 
 	return &Module{
 		router: router,

@@ -15,21 +15,18 @@ type User struct {
 	UpdatedAt time.Time
 	Sub       string
 	Email     string
-	Name      string
 	Username  *string
+	FirstName *string
+	LastName  *string
 }
 
-func NewUser(createdBy, sub, email, name string, username *string) (*User, error) {
+func NewUser(createdBy, sub, email string, username, firstName, lastName *string) (*User, error) {
 	if strings.TrimSpace(sub) == "" {
 		return nil, ErrSubRequired
 	}
 
 	if strings.TrimSpace(email) == "" {
 		return nil, ErrEmailRequired
-	}
-
-	if strings.TrimSpace(name) == "" {
-		return nil, ErrNameRequired
 	}
 
 	now := time.Now()
@@ -41,7 +38,8 @@ func NewUser(createdBy, sub, email, name string, username *string) (*User, error
 		UpdatedAt: now,
 		Sub:       sub,
 		Email:     email,
-		Name:      name,
 		Username:  username,
+		FirstName: firstName,
+		LastName:  lastName,
 	}, nil
 }

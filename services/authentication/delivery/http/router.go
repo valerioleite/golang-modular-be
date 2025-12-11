@@ -15,7 +15,6 @@ type Router struct {
 	callbackGetHandler  *handlers.CallbackGetHandler
 	callbackPostHandler *handlers.CallbackPostHandler
 	refreshTokenHandler *handlers.RefreshTokenHandler
-	verifyTokenHandler  *handlers.VerifyTokenHandler
 	userInfoHandler     *handlers.UserInfoHandler
 }
 
@@ -25,7 +24,6 @@ func NewRouter(service *service.AuthenticationService) *Router {
 		callbackGetHandler:  handlers.NewCallbackGetHandler(service),
 		callbackPostHandler: handlers.NewCallbackPostHandler(service),
 		refreshTokenHandler: handlers.NewRefreshTokenHandler(service),
-		verifyTokenHandler:  handlers.NewVerifyTokenHandler(service),
 		userInfoHandler:     handlers.NewUserInfoHandler(service),
 	}
 }
@@ -33,12 +31,12 @@ func NewRouter(service *service.AuthenticationService) *Router {
 func (r *Router) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	loggingMiddleware := middleware.WithLogging("authentication")
+	requestContextMiddleware := middleware.WithRequestContext("authentication")
 
 	mux.HandleFunc("GET /api/authentication/swagger/", swagger.Handler("authentication"))
 
-	r.setupActuatorResources(mux, loggingMiddleware)
-	r.setupAuthenticationResources(mux, loggingMiddleware)
+	r.setupActuatorResources(mux, requestContextMiddleware)
+	r.setupAuthenticationResources(mux, requestContextMiddleware)
 
 	return mux
 }
@@ -54,15 +52,14 @@ func (r *Router) healthCheck(w http.ResponseWriter, req *http.Request) {
 	health.Handler("authentication")(w, req)
 }
 
-func (r *Router) setupActuatorResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("GET /api/authentication/v1/actuator/health", loggingMiddleware(http.HandlerFunc(r.healthCheck)))
+func (r *Router) setupActuatorResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("GET /api/authentication/v1/actuator/health", requestContextMiddleware(http.HandlerFunc(r.healthCheck)))
 }
 
-func (r *Router) setupAuthenticationResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("GET /api/authentication/v1/authentication/authorize", loggingMiddleware(http.HandlerFunc(r.loginHandler.Handle)))
-	mux.Handle("GET /api/authentication/v1/authentication/callback", loggingMiddleware(http.HandlerFunc(r.callbackGetHandler.Handle)))
-	mux.Handle("POST /api/authentication/v1/authentication/callback", loggingMiddleware(http.HandlerFunc(r.callbackPostHandler.Handle)))
-	mux.Handle("POST /api/authentication/v1/authentication/refresh", loggingMiddleware(http.HandlerFunc(r.refreshTokenHandler.Handle)))
-	mux.Handle("POST /api/authentication/v1/authentication/verify", loggingMiddleware(http.HandlerFunc(r.verifyTokenHandler.Handle)))
-	mux.Handle("GET /api/authentication/v1/authentication/userinfo", loggingMiddleware(middleware.HandleWithValidateToken(r.userInfoHandler.Handle)))
+func (r *Router) setupAuthenticationResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("GET /api/authentication/v1/authentication/authorize", requestContextMiddleware(http.HandlerFunc(r.loginHandler.Handle)))
+	mux.Handle("GET /api/authentication/v1/authentication/callback", requestContextMiddleware(http.HandlerFunc(r.callbackGetHandler.Handle)))
+	mux.Handle("POST /api/authentication/v1/authentication/callback", requestContextMiddleware(http.HandlerFunc(r.callbackPostHandler.Handle)))
+	mux.Handle("POST /api/authentication/v1/authentication/refresh", requestContextMiddleware(http.HandlerFunc(r.refreshTokenHandler.Handle)))
+	mux.Handle("GET /api/authentication/v1/authentication/userinfo", requestContextMiddleware(http.HandlerFunc(r.userInfoHandler.Handle)))
 }

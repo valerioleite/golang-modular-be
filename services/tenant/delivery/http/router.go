@@ -5,8 +5,8 @@ import (
 	"libraries/http/middleware"
 	"libraries/http/swagger"
 	"net/http"
-	_ "services/tenant/docs"
 	"services/tenant/delivery/http/handlers"
+	_ "services/tenant/docs"
 	"services/tenant/service"
 )
 
@@ -33,12 +33,12 @@ func NewRouter(service *service.TenantService) *Router {
 func (r *Router) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	loggingMiddleware := middleware.WithLogging("tenant")
+	requestContextMiddleware := middleware.WithRequestContext("tenant")
 
 	mux.HandleFunc("GET /api/tenant/swagger/", swagger.Handler("tenant"))
 
-	r.setupActuatorResources(mux, loggingMiddleware)
-	r.setupTenantResources(mux, loggingMiddleware)
+	r.setupActuatorResources(mux, requestContextMiddleware)
+	r.setupTenantResources(mux, requestContextMiddleware)
 
 	return mux
 }
@@ -54,15 +54,15 @@ func (r *Router) healthCheck(w http.ResponseWriter, req *http.Request) {
 	health.Handler("tenant")(w, req)
 }
 
-func (r *Router) setupActuatorResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("GET /api/tenant/v1/actuator/health", loggingMiddleware(http.HandlerFunc(r.healthCheck)))
+func (r *Router) setupActuatorResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("GET /api/tenant/v1/actuator/health", requestContextMiddleware(http.HandlerFunc(r.healthCheck)))
 }
 
-func (r *Router) setupTenantResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("POST /api/tenant/v1/tenants", loggingMiddleware(http.HandlerFunc(r.createHandler.Handle)))
-	mux.Handle("GET /api/tenant/v1/tenants", loggingMiddleware(http.HandlerFunc(r.listHandler.Handle)))
-	mux.Handle("GET /api/tenant/v1/tenants/{id}", loggingMiddleware(http.HandlerFunc(r.getHandler.Handle)))
-	mux.Handle("PUT /api/tenant/v1/tenants/{id}", loggingMiddleware(http.HandlerFunc(r.updateHandler.Handle)))
-	mux.Handle("PUT /api/tenant/v1/tenants/{id}/image", loggingMiddleware(http.HandlerFunc(r.updateImageHandler.Handle)))
-	mux.Handle("DELETE /api/tenant/v1/tenants/{id}", loggingMiddleware(http.HandlerFunc(r.deleteHandler.Handle)))
+func (r *Router) setupTenantResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("POST /api/tenant/v1/tenants", requestContextMiddleware(http.HandlerFunc(r.createHandler.Handle)))
+	mux.Handle("GET /api/tenant/v1/tenants", requestContextMiddleware(http.HandlerFunc(r.listHandler.Handle)))
+	mux.Handle("GET /api/tenant/v1/tenants/{id}", requestContextMiddleware(http.HandlerFunc(r.getHandler.Handle)))
+	mux.Handle("PUT /api/tenant/v1/tenants/{id}", requestContextMiddleware(http.HandlerFunc(r.updateHandler.Handle)))
+	mux.Handle("PUT /api/tenant/v1/tenants/{id}/image", requestContextMiddleware(http.HandlerFunc(r.updateImageHandler.Handle)))
+	mux.Handle("DELETE /api/tenant/v1/tenants/{id}", requestContextMiddleware(http.HandlerFunc(r.deleteHandler.Handle)))
 }

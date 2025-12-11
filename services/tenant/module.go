@@ -31,7 +31,7 @@ func NewModule(ctx context.Context, db *sql.DB) (*Module, error) {
 
 	router := http.NewRouter(tenantSvc)
 
-	slog.Info("Tenant module initialized successfully", "module", "tenant")
+	slog.Info("Tenant module initialized successfully")
 
 	return &Module{
 		router: router,

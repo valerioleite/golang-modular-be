@@ -16,7 +16,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Type "Bearer" followed by a space and JWT token.
+// @description JWT token (include "Bearer " prefix when sending)
 
 type Module struct {
 	router *http.Router
@@ -36,7 +36,7 @@ func NewModule(ctx context.Context) (*Module, error) {
 
 	router := http.NewRouter(authSvc)
 
-	slog.Info("Authentication module initialized successfully", "module", "authentication")
+	slog.Info("Authentication module initialized successfully")
 
 	return &Module{
 		router: router,

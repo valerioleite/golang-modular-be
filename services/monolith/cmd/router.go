@@ -3,6 +3,7 @@ package main
 import (
 	"libraries/domain"
 	httpLib "libraries/http"
+	"log/slog"
 	"net/http"
 	authHttp "services/authentication/delivery/http"
 	storageHttp "services/storage/delivery/http"
@@ -35,13 +36,15 @@ func (r *Router) SetupRoutes() *http.ServeMux {
 	userMux := r.userRouter.SetupRoutes()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		muxes := []*http.ServeMux{authMux, tenantMux, storageMux, userMux}
-		for _, m := range muxes {
+		muxList := []*http.ServeMux{authMux, tenantMux, storageMux, userMux}
+		for _, m := range muxList {
 			if handlerFound(m, req) {
 				m.ServeHTTP(w, req)
 				return
 			}
 		}
+
+		slog.Error("route not found", "path", req.URL.Path)
 
 		httpLib.HandleError(w, domain.NewNotFoundError("route not found"))
 	})

@@ -11,5 +11,4 @@ type AuthenticationRepository interface {
 	ExchangeCode(ctx context.Context, code string) (*domain.Token, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*domain.Token, error)
 	VerifyToken(ctx context.Context, token string) (*domain.UserInfo, error)
-	GetUserInfo(ctx context.Context, accessToken string) (*domain.UserInfo, error)
 }

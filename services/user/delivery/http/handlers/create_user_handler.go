@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"services/user/delivery/http/dto"
 	"services/user/service"
+	"time"
 )
 
 type CreateUserHandler struct {
@@ -38,7 +39,7 @@ func (h *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	// TODO: Get createdBy from authentication context
 	createdBy := "system"
 
-	user, err := h.service.Create(r.Context(), createdBy, req.Sub, req.Email, req.Name, req.Username)
+	user, err := h.service.Create(r.Context(), createdBy, req.Sub, req.Email, req.Username, req.FirstName, req.LastName)
 	if err != nil {
 		httpLib.HandleError(w, err)
 		return
@@ -47,13 +48,13 @@ func (h *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	response := dto.UserResponse{
 		ID:        user.ID.String(),
 		CreatedBy: user.CreatedBy,
-		CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		UpdatedBy: user.UpdatedBy,
-		UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
 		Sub:       user.Sub,
 		Email:     user.Email,
-		Name:      user.Name,
 		Username:  user.Username,
+		FirstName: user.LastName,
 	}
 
 	json.Write(w, http.StatusCreated, response)

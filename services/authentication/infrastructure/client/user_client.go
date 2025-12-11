@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"libraries/http/middleware"
 	"net/http"
 	"os"
 	"services/authentication/infrastructure/client/dto"
@@ -39,7 +40,7 @@ func (c *UserClient) CreateUser(ctx context.Context, req *dto.CreateUserRequest)
 	defer cancel()
 
 	url := fmt.Sprintf("%s/v1/users", c.baseURL)
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
+	httpReq, err := middleware.NewRequestWithContextAndHeaders(ctx, "POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -72,7 +73,7 @@ func (c *UserClient) GetUserBySub(ctx context.Context, sub string) (*dto.UserRes
 	defer cancel()
 
 	url := fmt.Sprintf("%s/v1/users/sub/%s", c.baseURL, sub)
-	httpReq, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	httpReq, err := middleware.NewRequestWithContextAndHeaders(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}

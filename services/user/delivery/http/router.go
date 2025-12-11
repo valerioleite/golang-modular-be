@@ -25,12 +25,12 @@ func NewRouter(service *service.UserService) *Router {
 func (r *Router) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	loggingMiddleware := middleware.WithLogging("user")
+	requestContextMiddleware := middleware.WithRequestContext("user")
 
 	mux.HandleFunc("GET /api/user/swagger/", swagger.Handler("user"))
 
-	r.setupActuatorResources(mux, loggingMiddleware)
-	r.setupUserResources(mux, loggingMiddleware)
+	r.setupActuatorResources(mux, requestContextMiddleware)
+	r.setupUserResources(mux, requestContextMiddleware)
 
 	return mux
 }
@@ -46,11 +46,11 @@ func (r *Router) healthCheck(w http.ResponseWriter, req *http.Request) {
 	health.Handler("user")(w, req)
 }
 
-func (r *Router) setupActuatorResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("GET /api/user/v1/actuator/health", loggingMiddleware(http.HandlerFunc(r.healthCheck)))
+func (r *Router) setupActuatorResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("GET /api/user/v1/actuator/health", requestContextMiddleware(http.HandlerFunc(r.healthCheck)))
 }
 
-func (r *Router) setupUserResources(mux *http.ServeMux, loggingMiddleware func(http.Handler) http.Handler) {
-	mux.Handle("POST /api/user/v1/users", loggingMiddleware(http.HandlerFunc(r.createHandler.Handle)))
-	mux.Handle("GET /api/user/v1/users/sub/{sub}", loggingMiddleware(http.HandlerFunc(r.getHandler.Handle)))
+func (r *Router) setupUserResources(mux *http.ServeMux, requestContextMiddleware func(http.Handler) http.Handler) {
+	mux.Handle("POST /api/user/v1/users", requestContextMiddleware(http.HandlerFunc(r.createHandler.Handle)))
+	mux.Handle("GET /api/user/v1/users/sub/{sub}", requestContextMiddleware(http.HandlerFunc(r.getHandler.Handle)))
 }
