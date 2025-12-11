@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: hr-app-monolith
-  GATEWAY_IMAGE_NAME: hr-app-gateway
 
 jobs:
   build-and-push:
@@ -38,36 +37,7 @@ jobs:
         id: repo
         run: echo "owner=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Check for gateway changes
-        id: gateway-changes
-        run: |
-          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ] && [ -n "${{ github.event.before }}" ]; then
-            if git diff --name-only ${{ github.event.before }} HEAD | grep -q "^gateway/"; then
-              echo "changed=true" >> $GITHUB_OUTPUT
-            else
-              echo "changed=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            if [ -d "gateway" ]; then
-              echo "changed=true" >> $GITHUB_OUTPUT
-            else
-              echo "changed=false" >> $GITHUB_OUTPUT
-            fi
-          fi
-
-      - name: Build and push gateway
-        if: steps.gateway-changes.outputs.changed == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./gateway
-          file: ./gateway/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ steps.repo.outputs.owner }}/${{ env.GATEWAY_IMAGE_NAME }}:dev
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push monolith
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
